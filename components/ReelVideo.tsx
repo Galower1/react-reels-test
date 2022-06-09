@@ -6,13 +6,7 @@ import {
   AVPlaybackStatusSuccess,
 } from "expo-av";
 import { Dimensions, StyleSheet } from "react-native";
-import { VideoRefKeys } from "./Reel";
-
-type VideoProps = {
-  id: string;
-  uri: string;
-  handleRef: (ref: VideoRefKeys) => void;
-};
+import { VideoProps } from "./Reel";
 
 const [width, height] = [
   Dimensions.get("window").width,
@@ -30,7 +24,9 @@ export const ReelVideo: React.FC<VideoProps> = ({
   const video = useRef<Video | null>(null);
 
   useEffect(() => {
-    handleRef({ [id]: video });
+    if (handleRef) {
+      handleRef({ [id]: video });
+    }
 
     return () => {
       video.current?.unloadAsync();

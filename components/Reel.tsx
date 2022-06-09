@@ -1,56 +1,55 @@
 import { Video } from "expo-av";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Dimensions, FlatList } from "react-native";
 import { ReelVideo } from "./ReelVideo";
-
-const data = [
-  {
-    id: "4321",
-    uri: "https://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4",
-  },
-  {
-    id: "4324234c23432c",
-    uri: "https://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4",
-  },
-  {
-    id: "44c234c234c23321",
-    uri: "https://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4",
-  },
-  {
-    id: "4324c324c234c2365vc45g1",
-    uri: "https://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4",
-  },
-  {
-    id: "43rgvgvdfg21",
-    uri: "https://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4",
-  },
-  {
-    id: "43dfgvdfgvsgn21",
-    uri: "https://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4",
-  },
-];
+import data from "../data.json";
 
 export interface VideoRefKeys {
   [id: string]: React.MutableRefObject<Video | null>;
 }
 
+export interface VideoProps {
+  id: string;
+  uri: string;
+  handleRef?: (ref: VideoRefKeys) => void;
+}
+
 export const Reel: React.FC = () => {
-  const [childVideos, setChildVideos] = useState<VideoRefKeys>({});
+  const [childVideoRefs, setChildVideoRefs] = useState<VideoRefKeys>({});
+  const [videos, setVideos] = useState<VideoProps[]>([]);
+
+  useEffect(() => {
+    loadVideos();
+  }, []);
 
   const handleRef = (ref: VideoRefKeys) => {
-    setChildVideos((prev) => {
+    setChildVideoRefs((prev) => {
       Object.assign(prev, ref);
       return prev;
+    });
+  };
+
+  const loadVideos = () => {
+    const start = videos.length;
+
+    const newVideos = data.map((item, i) => ({
+      ...item,
+      id: String(start + i),
+    }));
+
+    setVideos((prev) => {
+      const items = [...prev, ...newVideos];
+      return items;
     });
   };
 
   const viewConfigRef = useRef({ itemVisiblePercentThreshold: 90 });
 
   const _onViewableItemsChanged = useRef((items: any) => {
-    if (Object.keys(childVideos).length) {
+    if (Object.keys(childVideoRefs).length) {
       const changed = items.changed;
       changed.forEach((item: any) => {
-        const video = childVideos[item.key].current;
+        const video = childVideoRefs[item.key].current;
         if (video) {
           if (item.isViewable) {
             video.playAsync();
@@ -64,7 +63,7 @@ export const Reel: React.FC = () => {
 
   return (
     <FlatList
-      data={data}
+      data={videos}
       snapToAlignment="center"
       renderItem={({ item }) => (
         <ReelVideo uri={item.uri} handleRef={handleRef} id={item.id} />
@@ -73,7 +72,7 @@ export const Reel: React.FC = () => {
       pagingEnabled
       viewabilityConfig={viewConfigRef.current}
       onViewableItemsChanged={_onViewableItemsChanged.current}
-      decelerationRate={0.5}
+      decelerationRate="fast"
       windowSize={5}
       initialNumToRender={3}
       maxToRenderPerBatch={3}
