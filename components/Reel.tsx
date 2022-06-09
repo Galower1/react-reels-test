@@ -82,6 +82,7 @@ export const Reel: React.FC = () => {
         index,
       })}
       removeClippedSubviews
+      onEndReached={loadVideos}
     />
   );
 };
