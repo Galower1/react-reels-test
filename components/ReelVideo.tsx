@@ -1,10 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import {
-  Video,
-  ResizeMode,
-  AVPlaybackStatus,
-  AVPlaybackStatusSuccess,
-} from "expo-av";
+import { Video, ResizeMode } from "expo-av";
 import { Dimensions, StyleSheet } from "react-native";
 import { VideoProps } from "./Reel";
 
@@ -18,9 +13,6 @@ export const ReelVideo: React.FC<VideoProps> = ({
   uri,
   handleRef,
 }: VideoProps) => {
-  const [status, setStatus] = useState<
-    AVPlaybackStatusSuccess | AVPlaybackStatus
-  >();
   const video = useRef<Video | null>(null);
 
   useEffect(() => {
@@ -43,7 +35,6 @@ export const ReelVideo: React.FC<VideoProps> = ({
       useNativeControls
       resizeMode={ResizeMode.CONTAIN}
       isLooping
-      onPlaybackStatusUpdate={(status) => setStatus(() => status)}
     />
   );
 };
@@ -52,6 +43,5 @@ const styles = StyleSheet.create({
   video: {
     width,
     height,
-    backgroundColor: "black",
   },
 });

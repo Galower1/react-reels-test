@@ -1,6 +1,6 @@
 import { Video } from "expo-av";
 import React, { useEffect, useRef, useState } from "react";
-import { Dimensions, FlatList } from "react-native";
+import { Dimensions, FlatList, StyleSheet } from "react-native";
 import { ReelVideo } from "./ReelVideo";
 import data from "../data.json";
 
@@ -52,7 +52,7 @@ export const Reel: React.FC = () => {
         const video = childVideoRefs[item.key].current;
         if (video) {
           if (item.isViewable) {
-            video.playAsync();
+            setTimeout(() => video.playAsync(), 600);
           } else {
             video.pauseAsync();
           }
@@ -63,6 +63,7 @@ export const Reel: React.FC = () => {
 
   return (
     <FlatList
+      style={styles.list}
       data={videos}
       snapToAlignment="center"
       renderItem={({ item }) => (
@@ -73,7 +74,7 @@ export const Reel: React.FC = () => {
       viewabilityConfig={viewConfigRef.current}
       onViewableItemsChanged={_onViewableItemsChanged.current}
       decelerationRate="fast"
-      windowSize={5}
+      windowSize={10}
       initialNumToRender={3}
       maxToRenderPerBatch={3}
       getItemLayout={(_data, index) => ({
@@ -86,3 +87,9 @@ export const Reel: React.FC = () => {
     />
   );
 };
+
+const styles = StyleSheet.create({
+  list: {
+    backgroundColor: "black",
+  },
+});
